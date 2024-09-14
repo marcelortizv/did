@@ -125,8 +125,16 @@ compute.att_gt <- function(dp) {
       if (base_period == "universal") {
         if (tlist[pret] == tlist[(t+tfac)]) {
           attgt.list[[counter]] <- list(att=0, group=glist[g], year=tlist[(t+tfac)], post=0)
-          inffunc[,counter] <- rep(0,n)
-          counter <- counter+1
+          # inffunc[,counter] <- rep(0,n)
+          # counter <- counter+1
+          inffunc_updates[[update_counter]] <- list(
+            indices = rep(TRUE, n),  # Apply to all units
+            values = as.matrix(rep(0, n))       # Zero influence function
+          )
+
+          # Update the counters
+          update_counter <- update_counter + 1
+          counter <- counter + 1
           next
         }
       }
@@ -218,8 +226,16 @@ compute.att_gt <- function(dp) {
 
           if (reg_problems_likely | pscore_problems_likely) {
             attgt.list[[counter]] <- list(att=NA, group=glist[g], year=tlist[(t+tfac)], post=post.treat)
-            inffunc[,counter] <- NA
-            counter <- counter+1
+            # inffunc[,counter] <- NA
+            # counter <- counter+1
+            inffunc_updates[[update_counter]] <- list(
+              indices = rep(TRUE, n),  # Apply to all units
+              values = as.matrix(rep(NA, n))      # NA influence function
+            )
+
+            # Update the counters
+            update_counter <- update_counter + 1
+            counter <- counter + 1
             next
           }
         }
@@ -310,8 +326,16 @@ compute.att_gt <- function(dp) {
 
         if (skip_this_att_gt) {
           attgt.list[[counter]] <- list(att=NA, group=glist[g], year=tlist[(t+tfac)], post=post.treat)
-          inffunc[,counter] <- NA
-          counter <- counter+1
+          # inffunc[,counter] <- NA
+          # counter <- counter+1
+          inffunc_updates[[update_counter]] <- list(
+            indices = rep(TRUE, n),  # Apply to all units
+            values = as.matrix(rep(NA, n))      # NA influence function
+          )
+
+          # Update the counters
+          update_counter <- update_counter + 1
+          counter <- counter + 1
           next
         }
 
@@ -375,10 +399,6 @@ compute.att_gt <- function(dp) {
         att = attgt$ATT, group = glist[g], year = tlist[(t+tfac)], post = post.treat
       )
 
-      # recover the influence function
-      # start with vector of 0s because influence function
-      # for units that are not in G or C will be equal to 0
-      inf.func <- rep(0, n)
 
       # populate the influence function in the right places
       if(panel) {
@@ -415,7 +435,6 @@ compute.att_gt <- function(dp) {
     update <- inffunc_updates[[i]]
     data.table(row = which(update$indices), col = i, value = update$values)
   }))
-
   # Apply updates to the sparse matrix
   inffunc[cbind(update_inffunc$row, update_inffunc$col)] <- update_inffunc$value
 
