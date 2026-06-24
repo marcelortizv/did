@@ -24,12 +24,21 @@ same_matrix_elem <- function(A, B) {
   all.equal(dense_sort(A), dense_sort(B))
 }
 
-temp_lib <- tempfile()
-dir.create(temp_lib)
-withr::defer(unlink(temp_lib, recursive = TRUE), teardown_env())
-
 old_did_available <- FALSE
-if (!identical(Sys.getenv("NOT_CRAN"), "false")) {
+# The did 2.1.2 reference comparison needs a live CRAN install at test-collection time, which is
+# slow, network-dependent, and pulls a dependency chain into a temp library on every ordinary
+# `testthat::test_local()` run. Opt in explicitly with DID_TEST_REFERENCE_INSTALL=true (CI can set
+# it); everything below degrades to its skip_if(!old_did_available) guard otherwise. Also skipped
+# under coverage instrumentation (R_COVR=true): the callr sub-processes that load the old version
+# are fragile under covr.
+if (identical(Sys.getenv("DID_TEST_REFERENCE_INSTALL"), "true") &&
+    !identical(Sys.getenv("NOT_CRAN"), "false") &&
+    !identical(Sys.getenv("R_COVR"), "true") &&
+    requireNamespace("remotes", quietly = TRUE) &&
+    requireNamespace("withr", quietly = TRUE)) {
+  temp_lib <- tempfile()
+  dir.create(temp_lib)
+  withr::defer(unlink(temp_lib, recursive = TRUE), teardown_env())
   old_did_available <- tryCatch({
     # The install can fail with warnings (not errors), e.g. when the dependency
     # chain cannot compile from source, so suppress them and verify the result
@@ -48,8 +57,8 @@ if (!identical(Sys.getenv("NOT_CRAN"), "false")) {
 test_that("inference with balanced panel data and aggregations", {
   skip_on_cran()
   skip_if(!old_did_available, "did v2.1.2 not available from CRAN")
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   # tryCatch(detach("package:did"), error=function(e) "")
 
@@ -183,8 +192,8 @@ test_that("inference with balanced panel data and aggregations", {
 test_that("inference with clustering", {
   skip_on_cran()
   skip_if(!old_did_available, "did v2.1.2 not available from CRAN")
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   set.seed(1234)
   # dr
@@ -313,8 +322,8 @@ test_that("inference with clustering", {
 test_that("same inference with unbalanced panel and panel data", {
   skip_on_cran()
   skip_if(!old_did_available, "did v2.1.2 not available from CRAN")
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   res_factor <- att_gt(
     yname = "Y", xformla = ~X, data = data, tname = "period", idname = "id",
@@ -345,8 +354,8 @@ test_that("same inference with unbalanced panel and panel data", {
 test_that("inference with repeated cross sections", {
   skip_on_cran()
   skip_if(!old_did_available, "did v2.1.2 not available from CRAN")
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp, panel = FALSE)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp, panel = FALSE)
 
   set.seed(1234)
   # dr
@@ -476,8 +485,8 @@ test_that("inference with repeated cross sections", {
 test_that("inference with repeated cross sections and clustering", {
   skip_on_cran()
   skip_if(!old_did_available, "did v2.1.2 not available from CRAN")
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp, panel = FALSE)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp, panel = FALSE)
 
   set.seed(1234)
   # dr
@@ -607,8 +616,8 @@ test_that("inference with repeated cross sections and clustering", {
 test_that("inference with unbalanced panel", {
   skip_on_cran()
   skip_if(!old_did_available, "did v2.1.2 not available from CRAN")
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data <- data[-3, ]
 
   set.seed(1234)
@@ -742,8 +751,8 @@ test_that("inference with unbalanced panel", {
 test_that("inference with unbalanced panel and clustering", {
   skip_on_cran()
   skip_if(!old_did_available, "did v2.1.2 not available from CRAN")
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data <- data[-3, ]
 
 

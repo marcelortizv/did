@@ -10,9 +10,9 @@
 #-----------------------------------------------------------------------------
 test_that("att_gt works w/o dynamics, time effects, or group effects", {
   set.seed(09142024)
-  sp <- did::reset.sim()
+  sp <- reset.sim()
   sp$ipw <- FALSE
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
 
   # dr
   res_dr <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
@@ -29,9 +29,9 @@ test_that("att_gt works w/o dynamics, time effects, or group effects", {
 
 test_that("att_gt works using ipw", {
   set.seed(09142024)
-  sp <- did::reset.sim()
+  sp <- reset.sim()
   sp$reg <- FALSE
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
 
   # dr
   res_dr <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
@@ -48,10 +48,10 @@ test_that("att_gt works using ipw", {
 
 test_that("two period case", {
   set.seed(09142024)
-  sp <- did::reset.sim(time.periods=2)
+  sp <- reset.sim(time.periods=2)
   sp$ipw <- FALSE
   sp$n <- 10000
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
 
   res <- suppressWarnings(
     att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
@@ -73,11 +73,11 @@ test_that("two period case", {
 test_that("no covariates case", {
   set.seed(09142024)
   time.periods <- 4
-  sp <- did::reset.sim(time.periods=time.periods)
+  sp <- reset.sim(time.periods=time.periods)
 
   # no effect of covariates
   sp$bett <- sp$betu <- rep(0,time.periods)
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
 
   res_dr <- att_gt(yname="Y", xformla=~1, data=data, tname="period", idname="id",
                 gname="G", est_method="dr")
@@ -91,8 +91,8 @@ test_that("no covariates case", {
 
 test_that("repeated cross section", {
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp, panel=FALSE)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp, panel=FALSE)
 
   # dr
   res_dr <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
@@ -109,10 +109,10 @@ test_that("repeated cross section", {
 
 test_that("ipw repeated cross sections", {
   set.seed(09142024)
-  sp <- did::reset.sim()
+  sp <- reset.sim()
   sp$reg <- FALSE
   sp$n <- 20000 # these are noisy
-  data <- did::build_sim_dataset(sp, panel=FALSE)
+  data <- build_sim_dataset(sp, panel=FALSE)
 
   # dr
   res_dr <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
@@ -131,9 +131,9 @@ test_that("ipw repeated cross sections", {
 test_that("repeated cross sections dynamic effects", {
   set.seed(09142024)
   time.periods <- 4
-  sp <- did::reset.sim(time.periods=time.periods)
+  sp <- reset.sim(time.periods=time.periods)
   sp$te.e <- 1:time.periods
-  data <- did::build_sim_dataset(sp, panel=FALSE)
+  data <- build_sim_dataset(sp, panel=FALSE)
 
   # dr
   res_dr <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
@@ -148,8 +148,8 @@ test_that("repeated cross sections dynamic effects", {
 
 test_that("unbalanced panel", {
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   # drop second row to create unbalanced panel
   data <- data[-2,]
 
@@ -164,9 +164,9 @@ test_that("unbalanced panel", {
 
   # ipw version
   set.seed(09142024)
-  sp <- did::reset.sim()
+  sp <- reset.sim()
   sp$reg <- FALSE
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
   data <- data[-2,]
 
   res_ipw <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
@@ -176,8 +176,8 @@ test_that("unbalanced panel", {
 
   # unbalanced paenl without providing id, should error
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data <- data[sample(1:nrow(data),  size=floor(.9*nrow(data))),]
 
   expect_error(att_gt(yname="Y", xformla=~X, data=data, tname="period", idname=NULL,
@@ -186,9 +186,9 @@ test_that("unbalanced panel", {
 
 test_that("not yet treated comparison group", {
   set.seed(09142024)
-  sp <- did::reset.sim()
+  sp <- reset.sim()
   sp$reg <- FALSE
-  data <- did::build_sim_dataset(sp, panel=FALSE)
+  data <- build_sim_dataset(sp, panel=FALSE)
 
   # dr
   res <- att_gt(yname="Y", xformla=~X, data=data, tname="period",
@@ -199,8 +199,8 @@ test_that("not yet treated comparison group", {
 
   # no never treated group
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data <- subset(data, G > 0) # drop nevertreated
 
   # dr
@@ -229,10 +229,10 @@ test_that("aggregations", {
   set.seed(09142024)
   # dynamic effects
   time.periods <- 4
-  sp <- did::reset.sim(time.periods=time.periods)
+  sp <- reset.sim(time.periods=time.periods)
   sp$te <- 0
   sp$te.e <- 1:time.periods
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
 
   res <- att_gt(yname="Y", xformla=~X, data=data, tname="period",
                 control_group="nevertreated",
@@ -247,11 +247,11 @@ test_that("aggregations", {
   # group effects
   set.seed(09142024)
   time.periods <- 4
-  sp <- did::reset.sim(time.periods=time.periods)
+  sp <- reset.sim(time.periods=time.periods)
   sp$te <- 0
   sp$te.bet.ind <- 1:time.periods
   sp$reg <- FALSE
-  data <- did::build_sim_dataset(sp, panel=FALSE)
+  data <- build_sim_dataset(sp, panel=FALSE)
 
   res <- att_gt(yname="Y", xformla=~X, data=data, tname="period",
                 control_group="notyettreated",
@@ -265,10 +265,10 @@ test_that("aggregations", {
   # calendar time effects
   set.seed(09142024)
   time.periods <- 4
-  sp <- did::reset.sim(time.periods=time.periods)
+  sp <- reset.sim(time.periods=time.periods)
   sp$te <- 0
   sp$te.t <- sp$thet + 1:time.periods
-  data <- did::build_sim_dataset(sp, panel=FALSE)
+  data <- build_sim_dataset(sp, panel=FALSE)
 
   res <- att_gt(yname="Y", xformla=~X, data=data, tname="period",
                 control_group="nevertreated",
@@ -280,11 +280,11 @@ test_that("aggregations", {
 
   # balancing with respect to event time
   set.seed(09142024)
-  sp <- did::reset.sim()
+  sp <- reset.sim()
   sp$te <- 0
   sp$te.e <- 1:time.periods
   sp$te.bet.ind <- 1:time.periods
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
 
   res <- att_gt(yname="Y", xformla=~X, data=data, tname="period",
                 control_group="nevertreated",
@@ -303,10 +303,10 @@ test_that("aggregations", {
 test_that("unequally spaced groups", {
   set.seed(09142024)
   time.periods <- 8
-  sp <- did::reset.sim(time.periods=time.periods)
+  sp <- reset.sim(time.periods=time.periods)
   sp$te <- 0
   sp$te.e <- 1:time.periods
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
   keep.periods <- c(1,2,5,7)
   data <- subset(data, G %in% c(0, keep.periods))
   data <- subset(data, period %in% keep.periods)
@@ -327,8 +327,8 @@ test_that("unequally spaced groups", {
 
 test_that("some units treated in first period", {
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data <- subset(data, period >= 2)
 
   expect_warning(att_gt(yname="Y", xformla=~X, data=data, tname="period",
@@ -338,12 +338,12 @@ test_that("some units treated in first period", {
 
 test_that("min and max length of exposures", {
   set.seed(09142024)
-  sp <- did::reset.sim()
+  sp <- reset.sim()
   time.periods <- 4
   sp$te <- 0
   sp$te.e <- 1:time.periods
   sp$bett <- sp$betu <- rep(0,time.periods)
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
 
   res <- att_gt(yname="Y", xformla=~1, data=data, tname="period",
                 idname="id",
@@ -360,10 +360,10 @@ test_that("min and max length of exposures", {
 test_that("anticipation", {
   set.seed(09142024)
   time.periods <- 5
-  sp <- did::reset.sim(time.periods=time.periods)
+  sp <- reset.sim(time.periods=time.periods)
   sp$te <- 0
   sp$te.e <- -1:(time.periods-2)
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
   data$G <- ifelse(data$G==0, 0, data$G + 1) # add anticipation
   data <- subset(data, G <= time.periods) # drop last period (due to way data is constructed)
   # this will have an anticipation effect=-1, no effect at exposure,
@@ -412,8 +412,8 @@ test_that("anticipation", {
 
 test_that("significance level and uniform confidence bands", {
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   # 5% significance level
   set.seed(1234)
@@ -440,8 +440,8 @@ test_that("malformed data", {
   # some groups later than last treated period
   # plus missing groups
   time.periods <- 7
-  sp <- did::reset.sim(time.periods=time.periods)
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim(time.periods=time.periods)
+  data <- build_sim_dataset(sp)
   data <- subset(data, period <= 4)
   missingG_ids <- sample(unique(data$id), size=10)
   data[data$id %in% missingG_ids,"G"] <- NA
@@ -453,8 +453,8 @@ test_that("malformed data", {
   #-----------------------------------------------------------------------------
   # incorrectly specified id
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   expect_error(att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="brant",
                       gname="G", est_method="dr"))
@@ -463,10 +463,10 @@ test_that("malformed data", {
 test_that("varying or universal base period", {
   set.seed(09142024)
   time.periods <- 8
-  sp <- did::reset.sim(time.periods=time.periods)
+  sp <- reset.sim(time.periods=time.periods)
   sp$te <- 0
   sp$te.e <- 1:time.periods
-  data <- did::build_sim_dataset(sp)
+  data <- build_sim_dataset(sp)
   data <- subset(data, (G<=5) | G==0 )
   # add pre-treatment effects
   data$G <- ifelse(data$G==0, 0, data$G+3)
@@ -494,8 +494,8 @@ test_that("small groups", {
   # code should still compute in this case (as comparison
   # group is large, but should give a warning about small groups)
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   # keep only one observation from group 2
   G2_keep_id <- unique(subset(data, G==2)$id)[1]
   data <- subset(data, (G != 2) | (id == G2_keep_id))
@@ -522,8 +522,8 @@ test_that("small comparison group", {
   # code doesn't run here if use never treated comparison group
   # but should run for all groups except the last one when
   # the not-yet-treated comparison group
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   # keep only one observation from untreated group
   G0_keep_id <- unique(subset(data, G==0)$id)[1]
   data <- subset(data, (G != 0) | (id == G0_keep_id))
@@ -594,8 +594,8 @@ test_that("small comparison group", {
 
 test_that("custom estimation method", {
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   res <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
                 gname="G", est_method=DRDID::drdid_imp_panel, panel=TRUE)
   expect_equal(res$att[1], 1, tol=.5)
@@ -607,8 +607,8 @@ test_that("sampling weights", {
   set.seed(09142024)
   # the idea here is that we can re-weight and should
   # get the same thing as if we subset
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data2 <- data
   keepids <- sample(unique(data$id), length(unique(data$id)))
   data$w <- 1*(data$id %in% keepids) # weights shouldn't have to have mean/sum 1
@@ -633,8 +633,8 @@ test_that("sampling weights", {
 
 test_that("works when user column is literally named 'gname'", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   # Rename columns to match parameter names exactly
   names(data)[names(data) == "G"] <- "gname"
   names(data)[names(data) == "period"] <- "tname"
@@ -654,8 +654,8 @@ test_that("works when user column is literally named 'gname'", {
 
 test_that("works when user column is literally named 'gname' with faster_mode", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   names(data)[names(data) == "G"] <- "gname"
   names(data)[names(data) == "period"] <- "tname"
   names(data)[names(data) == "id"] <- "idname"
@@ -674,8 +674,8 @@ test_that("works when user column is literally named 'gname' with faster_mode", 
 
 test_that("time-varying weights: faster_mode matches slow mode (default fix_weights=NULL)", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data$tv_weight <- data$period + runif(nrow(data), -0.1, 0.1)
 
   for (em in c("reg", "dr", "ipw")) {
@@ -695,8 +695,8 @@ test_that("time-varying weights: faster_mode matches slow mode (default fix_weig
 
 test_that("fix_weights options: faster_mode matches slow mode (balanced panel)", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data$tv_weight <- data$period + runif(nrow(data), -0.1, 0.1)
 
   for (fw in c("varying", "base_period", "first_period")) {
@@ -714,8 +714,8 @@ test_that("fix_weights options: faster_mode matches slow mode (balanced panel)",
 
 test_that("time-invariant weights: all fix_weights options produce identical ATTs", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   n_ids <- length(unique(data$id))
   n_periods <- length(unique(data$period))
   data$const_weight <- rep(runif(n_ids, 1, 10), each = n_periods)
@@ -735,8 +735,8 @@ test_that("time-invariant weights: all fix_weights options produce identical ATT
 
 test_that("message emitted for time-varying weights in balanced panel", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data$tv_weight <- data$period * 1.0 + runif(nrow(data), 0, 0.5)
 
   expect_message(
@@ -748,8 +748,8 @@ test_that("message emitted for time-varying weights in balanced panel", {
 
 test_that("no message for time-invariant weights", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   n_ids <- length(unique(data$id))
   n_periods <- length(unique(data$period))
   data$const_weight <- rep(runif(n_ids, 1, 10), each = n_periods)
@@ -762,8 +762,8 @@ test_that("no message for time-invariant weights", {
 
 test_that("notyettreated with time-varying weights: faster_mode matches", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data$tv_weight <- data$period + runif(nrow(data), 0, 0.5)
 
   res_slow <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
@@ -778,8 +778,8 @@ test_that("notyettreated with time-varying weights: faster_mode matches", {
 
 test_that("RC with time-varying weights: faster_mode matches", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data$tv_weight <- data$period * 1.0 + runif(nrow(data), 0, 0.5)
 
   res_slow <- att_gt(yname="Y", data=data, tname="period", idname="id",
@@ -794,8 +794,8 @@ test_that("RC with time-varying weights: faster_mode matches", {
 
 test_that("fix_weights validation", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   expect_error(
     att_gt(yname="Y", data=data, tname="period", idname="id",
@@ -857,8 +857,8 @@ test_that("fix_weights validation", {
 
 test_that("unbalanced panel fix_weights with units missing from reference period", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   # Drop some treated units from first period so fix_weights="first_period" must drop them
   first_p <- min(data$period)
@@ -890,8 +890,8 @@ test_that("unbalanced panel fix_weights with units missing from reference period
 
 test_that("IF consistency: balanced panel, all fix_weights x est_method x base_period", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data$tv_weight <- data$period + runif(nrow(data), -0.1, 0.1)
 
   for (fw in c(NA, "varying", "base_period", "first_period")) {
@@ -922,8 +922,8 @@ test_that("IF consistency: balanced panel, all fix_weights x est_method x base_p
 
 test_that("IF consistency: balanced panel, notyettreated control group", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data$tv_weight <- data$period + runif(nrow(data), -0.1, 0.1)
 
   for (fw in c(NA, "varying", "base_period", "first_period")) {
@@ -950,8 +950,8 @@ test_that("IF consistency: balanced panel, notyettreated control group", {
 
 test_that("IF consistency: repeated cross-sections, default weights x est_method", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data$tv_weight <- data$period + runif(nrow(data), -0.1, 0.1)
 
   # RC with default weights (fix_weights=NULL); fixed weight options tested separately
@@ -978,8 +978,8 @@ test_that("IF consistency: repeated cross-sections, default weights x est_method
 
 test_that("IF consistency: unbalanced panel, default weights x est_method", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   # Create unbalanced panel by dropping some observations
   set.seed(42)
@@ -1009,8 +1009,8 @@ test_that("IF consistency: unbalanced panel, default weights x est_method", {
 
 test_that("IF consistency: no covariates (xformla=~1), all data types", {
   set.seed(20260401)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   # Balanced panel, no covariates
   for (fw in c(NA, "varying")) {
@@ -1048,8 +1048,8 @@ test_that("clustered standard errors", {
   set.seed(09142024)
   # check that we can compute when clustered standard errors are supplied
   # either as numeric or as factor
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
 
   data$cluster <- as.numeric(data$cluster)
   res_numeric <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id",
@@ -1090,8 +1090,8 @@ test_that("clustered standard errors", {
   # over time -- identically in both modes (the slow path used to accept this
   # input and fall back to i.i.d. SEs with bstrap = FALSE)
   set.seed(09142024)
-  sp <- did::reset.sim()
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim()
+  data <- build_sim_dataset(sp)
   data$cluster <- as.numeric(data$cluster)
   data[1,]$cluster <- data[1,]$cluster+1
 
@@ -1103,14 +1103,14 @@ test_that("clustered standard errors", {
 
   #-----------------------------------------------------------------------------
   # clustered standard errors with repeated cross sections data
-  data <- did::build_sim_dataset(sp, panel=FALSE)
+  data <- build_sim_dataset(sp, panel=FALSE)
   res_rc <- att_gt(yname="Y", xformla=~X, data=data, tname="period", idname="id", control_group="notyettreated",
                    gname="G", est_method="dr", clustervars="cluster", panel=FALSE)
   expect_equal(res_rc$att[1], 1, tol=.5)
 })
 
 test_that("faster mode enabled for panel data", {
-  data <- did::mpdta
+  data <- mpdta
   out <- att_gt(yname = "lemp", gname = "first.treat", idname = "countyreal", tname = "year",
                 xformla = ~1, data = data, bstrap = FALSE, cband = FALSE, base_period = "universal",
                 control_group = "nevertreated", est_method = "dr", faster_mode = FALSE)
@@ -1161,7 +1161,7 @@ test_that("faster mode enabled for panel data", {
 
 test_that("faster model enabled for repeated cross sectional data", {
 
-  data_rcs <- as.data.table(did::build_sim_dataset(reset.sim(time.periods=4, n=1000), panel=FALSE))
+  data_rcs <- as.data.table(build_sim_dataset(reset.sim(time.periods=4, n=1000), panel=FALSE))
   data_rcs$period <- as.integer(data_rcs$period)
   data_rcs[G == 0, G := Inf]
 
@@ -1530,7 +1530,7 @@ test_that("faster_mode time indexing matches baseline with panel data and varyin
   set.seed(54321)
 
   # Use the package's built-in data with non-standard time periods
-  data <- did::mpdta
+  data <- mpdta
 
   # Test with varying base period (default, where the bug was most obvious)
   res_slow <- att_gt(
@@ -1657,8 +1657,8 @@ test_that("faster_mode time indexing with universal base period", {
   set.seed(11111)
 
   # Simpler test with universal base period
-  sp <- did::reset.sim(time.periods = 5)
-  data <- did::build_sim_dataset(sp)
+  sp <- reset.sim(time.periods = 5)
+  data <- build_sim_dataset(sp)
 
   res_slow <- att_gt(
     yname = "Y",
